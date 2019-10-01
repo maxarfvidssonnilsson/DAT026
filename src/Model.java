@@ -1,4 +1,3 @@
-package bouncing_balls;
 
 /**
  * The physics model.
@@ -10,7 +9,7 @@ package bouncing_balls;
  * @author Simon Robillard
  *
  */
-class Model {
+public class Model {
 
 	double areaWidth, areaHeight;
 	
