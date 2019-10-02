@@ -14,9 +14,9 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.02;
+	final double GRAVITY = 0.0005;
 	int numberOfBalls = 500;
-	double averageSpeed = 0.1;
+	double averageSpeed = 0.01;
 	
 	Ball [] balls;
 
@@ -38,15 +38,15 @@ public class Model {
 			Ball b = new Ball(0,0,0,0,0);
 			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
 			b.x = ((double)random.nextInt((int)(width *100)))/150;
-			b.y = ((double)random.nextInt((int)(width *100)))/150;
-			b.radius = ((double)random.nextInt((int)(10000/numberOfBalls)))/1000;
+			b.y = ((double)random.nextInt((int)(height *100)))/150;
+			b.radius = ((double)random.nextInt((int)(1000/Math.pow(numberOfBalls,0.5))))/1000;
 			balls[i] = b;
 		}
 		return balls;
 	}
 
-	boolean collidesWithBorder (double radius, double position, double border) {
-		if (position < radius || position > border - radius) {
+	boolean collidesWithBorder (double radius, double position, double border, double velocity) {
+		if ((position < radius && velocity < 0) || (position > border - radius && velocity > 0)) {
 			return true;
 		}
 		return false;
@@ -55,16 +55,16 @@ public class Model {
 	void step(double deltaT) {
 		// TODO this method implements one step of simulation with a step deltaT
 		for (Ball b : balls) {
+
+			b.v.vy -= GRAVITY;
 			// detect collision with the border
-			if (collidesWithBorder(b.radius, b.x, areaWidth)) {
+			if (collidesWithBorder(b.radius, b.x, areaWidth, b.v.vx)) {
 				b.v.vx *= -1; // change direction of ball
 			}
-			if (collidesWithBorder(b.radius, b.y, areaHeight)) {
+			if (collidesWithBorder(b.radius, b.y, areaHeight, b.v.vy)) {
 				b.v.vy *= -1;
 			}
-			else {
-				b.v.vy -= GRAVITY;
-			}
+
 			for (Ball b2 : balls){
 				if (b != b2 && b.checkBallCollsion(b2)){
 					ballCollision(b, b2);
