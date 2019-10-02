@@ -13,7 +13,7 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.5;
+	final double GRAVITY = 0.01;
 	
 	Ball [] balls;
 
@@ -23,56 +23,78 @@ public class Model {
 		
 		// Initialize the model with a few balls
 		balls = new Ball[2];
-		balls[0] = new Ball(width / 3, height * 0.9, 2.2, 1.6, 0.2);
+		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 0.6, 0.2);
 		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
 	}
 
-	boolean collidesWithBorder (double radius, double position, double border) {
+	boolean checkBorderCollision(double radius, double position, double border) {
 		if (position < radius || position > border - radius) {
 			return true;
 		}
 		return false;
 	}
 
+	/*
+	boolean checkBallCollision(Ball b1, Ball b2, double step){
+		double b1X = b1.x + step * b1.v.vx;
+		double b1Y = b1.y + step * b1.v.vy;
+		double b2X = b2.x + step * b2.v.vx;
+		double b2Y = b2.y + step * b2.v.vy;
+
+		double distance = Math.sqrt(Math.pow(b1X - b2X,2)+Math.pow(b1Y -b2Y,2));
+		if (distance <= b1.radius + b2.radius)
+			return true;
+		else
+			return false;
+	}
+	*/
+
 	void step(double deltaT) {
-		// TODO this method implements one step of simulation with a step deltaT
-		for (Ball b : balls) {
+		for (Ball b1 : balls) {
 			// detect collision with the border
-			if (collidesWithBorder(b.radius, b.x, areaWidth)) {
-				b.v.vx *= -1; // change direction of ball
+
+			if (checkBorderCollision(b1.radius, b1.x + deltaT * b1.v.vx, areaWidth)) {
+				b1.v.vx *= -1; // change direction of ball
 			}
-			if (collidesWithBorder(b.radius, b.y, areaHeight)) {
-				b.v.vy *= -1;
+			if (checkBorderCollision(b1.radius, b1.y + deltaT * b1.v.vy, areaHeight)) {
+				b1.v.vy *= -1;
 			}
 			else {
-				b.v.vy -= GRAVITY;
+				b1.v.vy -= GRAVITY;
 			}
 			for (Ball b2 : balls){
-				if (b != b2 && b.checkBallCollsion(b2)){
-					ballCollision(b, b2);
+				double a = checkBallCollision(b1,b2, deltaT);
+				System.out.println(a);
+				if ((a>=0 && a <= 1) && b1 != b2){
+					b1.move(deltaT, a);
+					//b2.move(deltaT, a);
+					handleBallCollision(b1, b2);
+					b1.move(deltaT, (1-a));
+					//b2.move(deltaT,(1-a));
+				} else {
+					b1.move(deltaT, 1);
 				}
 			}
-			
-			// compute new position according to the speed of the ball
-			b.x += deltaT * b.v.vx;
-			b.y += deltaT * b.v.vy;
 		}
 	}
 
+	double checkBallCollision(Ball b1, Ball b2, double deltaT) {
 
+		return (b1.radius + b2.radius) /
+				Math.sqrt(
+						Math.pow((b1.v.vx - b2.v.vx) * deltaT, 2) + 
+						Math.pow((b1.v.vy - b2.v.vy) * deltaT, 2)
+						);
+	}
 
-	void ballCollision ( Ball b1, Ball b2){
-
+	void handleBallCollision(Ball b1, Ball b2){
 		Vector t = new Vector(b1.x - b2.x, b1.y - b2.y);
 
 		Vector relV = b1.v.subtract(b2.v);
-
 		Vector force = relV.projectOnVector(t);
 
 		b1.v = b1.v.subtract(force);
-
 		b2.v = b2.v.plus(force);
-
 	}
 	
 	/**
@@ -91,13 +113,9 @@ public class Model {
 			this.radius = r;
 		}
 
-
-		boolean checkBallCollsion (Ball b2){
-			double distance = Math.sqrt(Math.pow(this.x - b2.x,2)+Math.pow(this.y - b2.y,2));
-			if (distance <= this.radius + b2.radius)
-				return true;
-			else
-				return false;
+		void move (double step, double a) {
+			this.x += a * step * this.v.vx;
+			this.y += a * step * this.v.vy;
 		}
 	}
 
