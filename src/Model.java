@@ -35,11 +35,43 @@ public class Model {
 			if (b.y < b.radius || b.y > areaHeight - b.radius) {
 				b.vy *= -1;
 			}
+			else {
+				b.vy -= 0.5;
+			}
+			for (Ball b2 : balls){
+				if (b != b2 && checkBallCollsion(b, b2)){
+					ballCollision(b, b2);
+				}
+			}
+
 			
 			// compute new position according to the speed of the ball
 			b.x += deltaT * b.vx;
 			b.y += deltaT * b.vy;
 		}
+	}
+
+	boolean checkBallCollsion (Ball b1, Ball b2){
+		double distance = Math.sqrt(Math.pow(b1.x - b2.x,2)+Math.pow(b1.y - b2.y,2));
+		if (distance <= b1.radius + b2.radius)
+			return true;
+		else
+			return false;
+	}
+
+	void ballCollision ( Ball b1, Ball b2){
+
+		double relativeVx = b1.vx - b2.vx;
+		double relativeVY = b1.vy - b2.vy;
+		
+
+
+		/*
+		b1.x = -b1.x;
+		b2.x = -b2.x;
+		b1.y = -b1.y;
+		b2.y = -b2.y;
+		*/
 	}
 	
 	/**
