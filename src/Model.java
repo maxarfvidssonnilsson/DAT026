@@ -1,3 +1,4 @@
+import java.util.Random;
 
 /**
  * The physics model.
@@ -13,7 +14,9 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.5;
+	final double GRAVITY = 0.02;
+	int numberOfBalls = 500;
+	double averageSpeed = 0.1;
 	
 	Ball [] balls;
 
@@ -22,9 +25,24 @@ public class Model {
 		areaHeight = height;
 		
 		// Initialize the model with a few balls
-		balls = new Ball[2];
-		balls[0] = new Ball(width / 3, height * 0.9, 2.2, 1.6, 0.2);
-		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
+		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
+		//balls = new Ball[2];
+		//balls[0] = new Ball(width / 3, height * 0.9, 2.2, 1.6, 0.2);
+		//balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
+	}
+
+	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
+		Ball[] balls = new Ball[numberOfBalls];
+		Random random = new Random();
+		for (int i = 0; i < numberOfBalls; i++){
+			Ball b = new Ball(0,0,0,0,0);
+			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
+			b.x = ((double)random.nextInt((int)(width *100)))/150;
+			b.y = ((double)random.nextInt((int)(width *100)))/150;
+			b.radius = ((double)random.nextInt((int)(10000/numberOfBalls)))/1000;
+			balls[i] = b;
+		}
+		return balls;
 	}
 
 	boolean collidesWithBorder (double radius, double position, double border) {
@@ -50,6 +68,8 @@ public class Model {
 			for (Ball b2 : balls){
 				if (b != b2 && b.checkBallCollsion(b2)){
 					ballCollision(b, b2);
+					//slowBall(b2);
+					//slowBall(b);
 				}
 			}
 			
@@ -57,6 +77,10 @@ public class Model {
 			b.x += deltaT * b.v.vx;
 			b.y += deltaT * b.v.vy;
 		}
+	}
+
+	void slowBall (Ball ball){
+		ball.v = ball.v.subtract(new Vector(ball.v.vx * 0.05,ball.v.vy * 0.05));
 	}
 
 
