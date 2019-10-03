@@ -41,13 +41,14 @@ public class Model {
 	void step(double deltaT) {
 		for (Ball b1 : balls) {
 
-			b1.v.vy -= GRAVITY;
 			// detect collision with the border
 			if (collidesWithBorder(b1.radius, b1.x, areaWidth, b1.v.vx)) {
 				b1.v.vx *= -1; // change direction of ball
 			}
-			if (collidesWithBorder(b1.radius, b1.y, areaHeight, b1.v.vy)) {
-				b1.v.vy *= -1;
+			if (collidesWithBorder(b.radius, b.y, areaHeight, b.v.vy)) {
+				b.v.vy *= -1;
+			} else {
+				b.v.vy -= GRAVITY;
 			}
 
 			for (Ball b2 : balls){
