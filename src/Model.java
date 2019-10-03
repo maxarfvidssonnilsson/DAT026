@@ -4,9 +4,10 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.2;
+	final double GRAVITY = 0.07;
 	int numberOfBalls = 5;
 	double averageSpeed = 0.5;
+	double errorMargin = 0.1;
 	
 	Ball [] balls;
 
@@ -58,12 +59,12 @@ public class Model {
 				if (b1 != b2 && b1.checkBallCollsion(b2)){
 					double distance = Math.sqrt(Math.pow(b1.x - b2.x,2)+Math.pow(b1.y - b2.y,2));
 					int i = 0;
-					while ((distance <= b1.radius + b2.radius) || i == 10) {
+					while ((distance <= b1.radius + b2.radius) && i != 10 ) {
 
-						b1.x -= b1.v.vx * 0.1 * deltaT;
-						b2.y -= b2.v.vy * 0.1 * deltaT;
-						b1.y -= b1.v.vy * 0.1 * deltaT;
-						b2.x -= b2.v.vx * 0.1 * deltaT;
+						b1.x -= b1.v.vx * errorMargin * deltaT;
+						b2.y -= b2.v.vy * errorMargin* deltaT;
+						b1.y -= b1.v.vy * errorMargin * deltaT;
+						b2.x -= b2.v.vx * errorMargin * deltaT;
 
 						distance = Math.sqrt(Math.pow(b1.x - b2.x, 2) + Math.pow(b1.y - b2.y, 2));
 						i++;
