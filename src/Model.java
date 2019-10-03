@@ -1,3 +1,4 @@
+import java.util.Random;
 
 /**
  * The physics model.
@@ -13,7 +14,9 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.01;
+	final double GRAVITY = 0.0005;
+	int numberOfBalls = 500;
+	double averageSpeed = 0.01;
 	
 	Ball [] balls;
 
@@ -22,13 +25,29 @@ public class Model {
 		areaHeight = height;
 		
 		// Initialize the model with a few balls
-		balls = new Ball[2];
-		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 0.6, 0.2);
-		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
+
+		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
+		//balls = new Ball[2];
+		//balls[0] = new Ball(width / 3, height * 0.9, 2.2, 1.6, 0.2);
+		//balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
 	}
 
-	boolean checkBorderCollision(double radius, double position, double border) {
-		if (position < radius || position > border - radius) {
+	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
+		Ball[] balls = new Ball[numberOfBalls];
+		Random random = new Random();
+		for (int i = 0; i < numberOfBalls; i++){
+			Ball b = new Ball(0,0,0,0,0);
+			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
+			b.x = ((double)random.nextInt((int)(width *100)))/150;
+			b.y = ((double)random.nextInt((int)(height *100)))/150;
+			b.radius = ((double)random.nextInt((int)(1000/Math.pow(numberOfBalls,0.5))))/1000;
+			balls[i] = b;
+		}
+		return balls;
+	}
+
+	boolean collidesWithBorder (double radius, double position, double border, double velocity) {
+		if ((position < radius && velocity < 0) || (position > border - radius && velocity > 0)) {
 			return true;
 		}
 		return false;
@@ -53,10 +72,10 @@ public class Model {
 		for (Ball b1 : balls) {
 			// detect collision with the border
 
-			if (checkBorderCollision(b1.radius, b1.x + deltaT * b1.v.vx, areaWidth)) {
+			if (collidesWithBorder(b1.radius, b1.x, areaWidth, b1.v.vx)) {
 				b1.v.vx *= -1; // change direction of ball
 			}
-			if (checkBorderCollision(b1.radius, b1.y + deltaT * b1.v.vy, areaHeight)) {
+			if (collidesWithBorder(b1.radius, b1.y, areaHeight, b1.v.vy)) {
 				b1.v.vy *= -1;
 			}
 			else {
@@ -77,7 +96,9 @@ public class Model {
 			}
 		}
 	}
-
+				void slowBall (Ball ball){
+					ball.v = ball.v.subtract(new Vector(ball.v.vx * 0.05,ball.v.vy * 0.05));
+				}
 	double checkBallCollision(Ball b1, Ball b2, double deltaT) {
 
 		return (b1.radius + b2.radius) /
