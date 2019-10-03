@@ -4,7 +4,7 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.5;
+	final double GRAVITY = 0.2;
 	int numberOfBalls = 20;
 	double averageSpeed = 0.5;
 	
@@ -16,7 +16,7 @@ public class Model {
 
 		//balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
 		balls = new Ball[2];
-		balls[0] = new Ball(width / 3, height * 0.9, 2.2, 1.6, 0.2);
+		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
 		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
 	}
 
@@ -45,10 +45,10 @@ public class Model {
 			if (collidesWithBorder(b1.radius, b1.x, areaWidth, b1.v.vx)) {
 				b1.v.vx *= -1; // change direction of ball
 			}
-			if (collidesWithBorder(b.radius, b.y, areaHeight, b.v.vy)) {
-				b.v.vy *= -1;
+			if (collidesWithBorder(b1.radius, b1.y, areaHeight, b1.v.vy)) {
+				b1.v.vy *= -1;
 			} else {
-				b.v.vy -= GRAVITY;
+				b1.v.vy -= GRAVITY;
 			}
 
 			for (Ball b2 : balls){
@@ -86,15 +86,15 @@ public class Model {
 		b1.v = b1.v.subtract(force);
 		b2.v = b2.v.plus(force);
 
-		double ditance = (b1.radius + b2.radius) - Math.sqrt(Math.pow((b1.x - b2.x),2) + Math.pow((b2.y - b2.y),2));
-
-		Vector unitVector = new Vector(force.vx/force.length(),force.vy / force.length());
-		Vector z = new Vector(unitVector.vx *ditance/2, unitVector.vy * ditance/2);
-		b2.y += z.vy * deltaT;
-		b2.x += z.vx * deltaT;
-
-		b1.y -= z.vy * deltaT;
-		b1.x -= z.vx * deltaT;
+//		double ditance = (b1.radius + b2.radius) - Math.sqrt(Math.pow((b1.x - b2.x),2) + Math.pow((b2.y - b2.y),2));
+//
+//		Vector unitVector = new Vector(force.vx/force.length(),force.vy / force.length());
+//		Vector z = new Vector(unitVector.vx *ditance/2, unitVector.vy * ditance/2);
+//		b2.y += z.vy * deltaT;
+//		b2.x += z.vx * deltaT;
+//
+//		b1.y -= z.vy * deltaT;
+//		b1.x -= z.vx * deltaT;
 
 
 	}
