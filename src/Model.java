@@ -5,7 +5,7 @@ public class Model {
 	double areaWidth, areaHeight;
 
 	final double GRAVITY = 0.2;
-	int numberOfBalls = 20;
+	int numberOfBalls = 5;
 	double averageSpeed = 0.5;
 	
 	Ball [] balls;
@@ -14,13 +14,13 @@ public class Model {
 		areaWidth = width;
 		areaHeight = height;
 
-		//balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
-		balls = new Ball[2];
-		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
-		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
+		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
+		//balls = new Ball[2];
+		//balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
+		//balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
 	}
 
-	/*
+
 	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
 		Ball[] balls = new Ball[numberOfBalls];
 		Random random = new Random();
@@ -34,13 +34,16 @@ public class Model {
 		}
 		return balls;
 	}
-	*/
+
 
 
 
 	void step(double deltaT) {
 		for (Ball b1 : balls) {
+			b1.x += deltaT * b1.v.vx;
+			b1.y += deltaT * b1.v.vy;
 
+			boolean isInGround = true;
 			// detect collision with the border
 			if (collidesWithBorder(b1.radius, b1.x, areaWidth, b1.v.vx)) {
 				b1.v.vx *= -1; // change direction of ball
@@ -48,27 +51,28 @@ public class Model {
 			if (collidesWithBorder(b1.radius, b1.y, areaHeight, b1.v.vy)) {
 				b1.v.vy *= -1;
 			} else {
-				b1.v.vy -= GRAVITY;
+				isInGround = false;
 			}
 
 			for (Ball b2 : balls){
 				if (b1 != b2 && b1.checkBallCollsion(b2)){
 					double distance = Math.sqrt(Math.pow(b1.x - b2.x,2)+Math.pow(b1.y - b2.y,2));
-					while (distance <= b1.radius + b2.radius) {
+					int i = 0;
+					while ((distance <= b1.radius + b2.radius) || i == 10) {
 
 						b1.x -= b1.v.vx * 0.1 * deltaT;
 						b2.y -= b2.v.vy * 0.1 * deltaT;
-						b1.x -= b1.v.vx * 0.1 * deltaT;
-						b2.y -= b2.v.vy * 0.1 * deltaT;
+						b1.y -= b1.v.vy * 0.1 * deltaT;
+						b2.x -= b2.v.vx * 0.1 * deltaT;
 
 						distance = Math.sqrt(Math.pow(b1.x - b2.x, 2) + Math.pow(b1.y - b2.y, 2));
+						i++;
 					}
 					ballCollision(b1, b2,deltaT);
 				}
 			}
-
-			b1.x += deltaT * b1.v.vx;
-			b1.y += deltaT * b1.v.vy;
+			if(!isInGround)
+				b1.v.vy -= GRAVITY;
 		}
 	}
 
