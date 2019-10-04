@@ -5,7 +5,7 @@ public class Model {
 	double areaWidth, areaHeight;
 
 	final double GRAVITY = 0.07;
-	int numberOfBalls = 5;
+	int numberOfBalls = 2;
 	double averageSpeed = 0.5;
 	double errorMargin = 0.1;
 	
@@ -92,15 +92,14 @@ public class Model {
 
 
 		double velocity1 = 	((b1.getMass() - b2.getMass()) / (b1.getMass() + b2.getMass())) * force.length() +
-							(2 * b2.getMass())             / (b1.getMass() + b2.getMass())  * 0;
+							((2 * b2.getMass())            / (b1.getMass() + b2.getMass())) * 0;
 
 
-		double velocity2 = 	(2 * b1.getMass())             / (b1.getMass() + b2.getMass())  * force.length()  +
+		double velocity2 = 	((2 * b1.getMass())            / (b1.getMass() + b2.getMass())) * force.length()  +
 							((b2.getMass() - b1.getMass()) / (b1.getMass() + b2.getMass())) * 0;
 
 		b1.v = b1.v.subtract(force.withLenght(velocity1));
 		b2.v = b2.v.plus(force.withLenght(velocity2));
-
 
 
 	}
