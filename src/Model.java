@@ -5,7 +5,7 @@ public class Model {
 	double areaWidth, areaHeight;
 
 	final double GRAVITY = 0.07;
-	int numberOfBalls = 5;
+	int numberOfBalls = 10;
 	double averageSpeed = 0.5;
 	double errorMargin = 0.1;
 	
@@ -27,10 +27,26 @@ public class Model {
 		Random random = new Random();
 		for (int i = 0; i < numberOfBalls; i++){
 			Ball b = new Ball(0,0,0,0,0);
-			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
-			b.x = ((double)random.nextInt((int)(width *100)))/150;
-			b.y = ((double)random.nextInt((int)(height *100)))/150;
 			b.radius = ((double)random.nextInt((int)(1000/Math.pow(numberOfBalls,0.5))))/1000;
+			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
+
+			boolean hasFound = false;
+			while (!hasFound) {
+				b.x = ((double) random.nextInt((int) (width * 100))) / 150;
+				b.y = ((double) random.nextInt((int) (height * 100))) / 150;
+				hasFound = true;
+				for (int j = 0; j < balls.length; j++){
+					if (balls[j] != null && Math.sqrt( Math.pow(b.x - balls[j].x,2) + Math.pow(b.y - balls[j].y, 2) ) < b.radius + balls[j].radius){
+
+						hasFound = false;
+						j = balls.length;
+					}
+					if(b.x < b.radius || b.y < b.radius) {
+						hasFound = false;
+						j = balls.length;
+					}
+				}
+			}
 			balls[i] = b;
 		}
 		return balls;
