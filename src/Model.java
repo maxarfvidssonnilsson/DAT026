@@ -5,7 +5,7 @@ public class Model {
 	double areaWidth, areaHeight;
 
 	final double GRAVITY = 0;
-	int numberOfBalls = 2;
+	int numberOfBalls = 4;
 	double averageSpeed = 0.5;
 	double errorMargin = 0.1;
 	
@@ -15,26 +15,26 @@ public class Model {
 		areaWidth = width;
 		areaHeight = height;
 
-//		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
-		balls = new Ball[2];
-		balls[0] = new Ball(width / 4, height / 4, 1, 1, 0.2);
-		balls[1] = new Ball(3 * width / 4, height / 4, -1, 1, 0.2);
+		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
+//		balls = new Ball[2];
+//		balls[0] = new Ball(width / 4, height / 4, 1, 1, 0.2);
+//		balls[1] = new Ball(3 * width / 4, height / 4, -1, 1, 0.2);
 	}
 
-//
-//	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
-//		Ball[] balls = new Ball[numberOfBalls];
-//		Random random = new Random();
-//		for (int i = 0; i < numberOfBalls; i++){
-//			Ball b = new Ball(0,0,0,0,0);
-//			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
-//			b.x = ((double)random.nextInt((int)(width *100)))/150;
-//			b.y = ((double)random.nextInt((int)(height *100)))/150;
-//			b.radius = ((double)random.nextInt((int)(1000/Math.pow(numberOfBalls,0.5))))/1000;
-//			balls[i] = b;
-//		}
-//		return balls;
-//	}
+
+	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
+		Ball[] balls = new Ball[numberOfBalls];
+		Random random = new Random();
+		for (int i = 0; i < numberOfBalls; i++){
+			Ball b = new Ball(0,0,0,0,0);
+			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
+			b.x = ((double)random.nextInt((int)(width *100)))/150;
+			b.y = ((double)random.nextInt((int)(height *100)))/150;
+			b.radius = ((double)random.nextInt((int)(1000/Math.pow(numberOfBalls,0.5))))/1000;
+			balls[i] = b;
+		}
+		return balls;
+	}
 
 	void step(double deltaT) {
 		for (Ball b1 : balls) {
@@ -82,27 +82,30 @@ public class Model {
 	}
 
 	void ballCollision ( Ball b1, Ball b2, double deltaT){
-		Vector t = new Vector(b1.x - b2.x, b1.y - b2.y);
+		Vector tangent = new Vector(b1.x - b2.x, b1.y - b2.y);
 
 		double före = b1.getMass()*b1.v.length()+b2.getMass()*b2.v.length();
 
-		Vector relV = b1.v.subtract(b2.v);
-		Vector force = relV.projectOnVector(t);
+		//Vector relV = b1.v.subtract(b2.v);
+		//Vector force = relV.projectOnVector(tangent);
+		Vector directedV1 = b1.v.projectOnVector(tangent);
+		Vector directedV2 = b1.v.projectOnVector(tangent);
 //
 //		b1.v = b1.v.subtract(force);
 //		b2.v = b2.v.plus(force);
 
 
-		double velocity1 = 	(((b1.getMass() - b2.getMass()) / (b1.getMass() + b2.getMass())) * force.length()) +
-							(((2 * b2.getMass())            / (b1.getMass() + b2.getMass())) * 0);
+		double velocity1 = 	((b1.getMass() - b2.getMass()) / (b1.getMass() + b2.getMass())) * directedV1.length() +
+				((2 * b2.getMass())            / (b1.getMass() + b2.getMass())) * directedV2.length();
 
 
-		double velocity2 = 	((2 * b1.getMass())            / (b1.getMass() + b2.getMass())) * force.length()  +
-							((b2.getMass() - b1.getMass()) / (b1.getMass() + b2.getMass())) * 0;
+		double velocity2 = 	((2 * b1.getMass())            / (b1.getMass() + b2.getMass())) * directedV1.length()  +
+				((b2.getMass() - b1.getMass()) / (b1.getMass() + b2.getMass())) * directedV2.length();
 
-		System.out.println(velocity1 + ", " + velocity2);
-		b1.v = b1.v.subtract(force.withLenght(velocity1));
-		b2.v = b2.v.plus(force.withLenght(velocity2));
+		b1.v = b1.v.subtract(tangent.withLenght(velocity1));
+		b1.v = b1.v.subtract(directedV1);
+		b2.v = b2.v.plus(tangent.withLenght(velocity2));
+		b2.v = b2.v.subtract(directedV2);
 		System.out.println("Efter-------------------------------");
 		System.out.println( före - b1.getMass()*b1.v.length()+b2.getMass()*b2.v.length());
 		System.out.println();
