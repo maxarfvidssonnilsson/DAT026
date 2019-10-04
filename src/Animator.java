@@ -71,7 +71,7 @@ public final class Animator extends JPanel implements ActionListener {
 			g2.fill(e);
 			//diagonal line
 			g.setColor(Color.blue);
-			g.drawLine((int)(b.x * pixelsPerMeter),(int)( this.getHeight() - (b.y)*pixelsPerMeter), (int)((b.x + b.v.vx)*pixelsPerMeter), (int)( this.getHeight() - (b.y + b.v.vy)*pixelsPerMeter));
+			g.drawLine((int)(b.x * pixelsPerMeter),(int)( this.getHeight() - (b.y)*pixelsPerMeter), (int)((b.x + b.v.vx/4)*pixelsPerMeter), (int)( this.getHeight() - (b.y + b.v.vy/4)*pixelsPerMeter));
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}

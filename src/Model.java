@@ -4,7 +4,7 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.07;
+	final double GRAVITY = 0;
 	int numberOfBalls = 2;
 	double averageSpeed = 0.5;
 	double errorMargin = 0.1;
@@ -17,8 +17,8 @@ public class Model {
 
 //		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
 		balls = new Ball[2];
-		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.2, 0.2);
-		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, -0.6, 0.3);
+		balls[0] = new Ball(width / 4, height / 4, 1, 1, 0.2);
+		balls[1] = new Ball(3 * width / 4, height / 4, -1, 1, 0.2);
 	}
 
 //
@@ -93,13 +93,14 @@ public class Model {
 //		b2.v = b2.v.plus(force);
 
 
-		double velocity1 = 	((b1.getMass() - b2.getMass()) / (b1.getMass() + b2.getMass())) * force.length() +
-							((2 * b2.getMass())            / (b1.getMass() + b2.getMass())) * 0;
+		double velocity1 = 	(((b1.getMass() - b2.getMass()) / (b1.getMass() + b2.getMass())) * force.length()) +
+							(((2 * b2.getMass())            / (b1.getMass() + b2.getMass())) * 0);
 
 
 		double velocity2 = 	((2 * b1.getMass())            / (b1.getMass() + b2.getMass())) * force.length()  +
 							((b2.getMass() - b1.getMass()) / (b1.getMass() + b2.getMass())) * 0;
 
+		System.out.println(velocity1 + ", " + velocity2);
 		b1.v = b1.v.subtract(force.withLenght(velocity1));
 		b2.v = b2.v.plus(force.withLenght(velocity2));
 		System.out.println("Efter-------------------------------");
