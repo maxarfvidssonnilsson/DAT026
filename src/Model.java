@@ -36,9 +36,6 @@ public class Model {
 		return balls;
 	}
 
-
-
-
 	void step(double deltaT) {
 		for (Ball b1 : balls) {
 			b1.x += deltaT * b1.v.vx;
@@ -86,21 +83,23 @@ public class Model {
 
 	void ballCollision ( Ball b1, Ball b2, double deltaT){
 		Vector t = new Vector(b1.x - b2.x, b1.y - b2.y);
+
 		Vector relV = b1.v.subtract(b2.v);
 		Vector force = relV.projectOnVector(t);
-		b1.v = b1.v.subtract(force);
-		b2.v = b2.v.plus(force);
 
-//		double ditance = (b1.radius + b2.radius) - Math.sqrt(Math.pow((b1.x - b2.x),2) + Math.pow((b2.y - b2.y),2));
-//
-//		Vector unitVector = new Vector(force.vx/force.length(),force.vy / force.length());
-//		Vector z = new Vector(unitVector.vx *ditance/2, unitVector.vy * ditance/2);
-//		b2.y += z.vy * deltaT;
-//		b2.x += z.vx * deltaT;
-//
-//		b1.y -= z.vy * deltaT;
-//		b1.x -= z.vx * deltaT;
+		double u1 = b1.v.projectOnVector(t).length();
+		double u2 = b2.v.projectOnVector(t).length();
 
+		double velocity1 = 	((b1.getMass() - b2.getMass()) / (b1.getMass() + b2.getMass())) * u1 +
+							(2 * b2.getMass())             / (b1.getMass() + b2.getMass())  * u2;
+
+
+		double velocity2 = 	(2 * b1.getMass())             / (b1.getMass() + b2.getMass())  * u1  +
+							((b2.getMass() - b1.getMass()) / (b1.getMass() + b2.getMass())) * u2;
+
+
+		b1.v = b1.v.subtract(t.withLenght(velocity1));
+		b2.v = b2.v.plus(t.withLenght(velocity2));
 
 	}
 
@@ -114,6 +113,10 @@ public class Model {
 			this.y = y;
 			this.v = new Vector(vx, vy);
 			this.radius = r;
+		}
+
+		double getMass() {
+			return Math.PI * Math.pow(this.radius , 2);
 		}
 
 		boolean checkBallCollsion (Ball b2){
@@ -158,6 +161,10 @@ public class Model {
 
 		Vector plus (Vector v) {
 			return new Vector(this.vx + v.vx, this.vy + v.vy);
+		}
+
+		Vector withLenght(double len) {
+			return new Vector(this.vx*len/this.length(),this.vy*len/this.length());
 		}
 	}
 }
