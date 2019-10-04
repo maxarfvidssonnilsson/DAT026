@@ -1,8 +1,6 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowFocusListener;
 import java.awt.geom.Ellipse2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -63,14 +61,17 @@ public final class Animator extends JPanel implements ActionListener {
 		g2.setColor(Color.WHITE);
 		g2.fillRect(0, 0, this.getWidth(), this.getHeight());
 		// draw balls
-		g2.setColor(Color.RED);
 		for (Model.Ball b : model.balls) {
 			double x = b.x - b.radius;
 			double y = b.y + b.radius;
 			// paint balls (y-coordinates are inverted)
+			g2.setColor(Color.RED);
 			Ellipse2D.Double e = new Ellipse2D.Double(x * pixelsPerMeter, this.getHeight() - (y * pixelsPerMeter),
 					b.radius * 2 * pixelsPerMeter, b.radius * 2 * pixelsPerMeter);
 			g2.fill(e);
+			//diagonal line
+			g.setColor(Color.blue);
+			g.drawLine((int)(b.x * pixelsPerMeter),(int)( this.getHeight() - (b.y)*pixelsPerMeter), (int)((b.x + b.v.vx)*pixelsPerMeter), (int)( this.getHeight() - (b.y + b.v.vy)*pixelsPerMeter));
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}

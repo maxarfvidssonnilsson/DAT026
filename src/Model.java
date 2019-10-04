@@ -15,26 +15,26 @@ public class Model {
 		areaWidth = width;
 		areaHeight = height;
 
-		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
-		//balls = new Ball[2];
-		//balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
-		//balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
+//		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
+		balls = new Ball[2];
+		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.2, 0.2);
+		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, -0.6, 0.3);
 	}
 
-
-	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
-		Ball[] balls = new Ball[numberOfBalls];
-		Random random = new Random();
-		for (int i = 0; i < numberOfBalls; i++){
-			Ball b = new Ball(0,0,0,0,0);
-			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
-			b.x = ((double)random.nextInt((int)(width *100)))/150;
-			b.y = ((double)random.nextInt((int)(height *100)))/150;
-			b.radius = ((double)random.nextInt((int)(1000/Math.pow(numberOfBalls,0.5))))/1000;
-			balls[i] = b;
-		}
-		return balls;
-	}
+//
+//	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
+//		Ball[] balls = new Ball[numberOfBalls];
+//		Random random = new Random();
+//		for (int i = 0; i < numberOfBalls; i++){
+//			Ball b = new Ball(0,0,0,0,0);
+//			b.v = new Vector(((double)random.nextInt((int) (averageSpeed*200)))/100, ((double)random.nextInt((int) (averageSpeed*200)))/100);
+//			b.x = ((double)random.nextInt((int)(width *100)))/150;
+//			b.y = ((double)random.nextInt((int)(height *100)))/150;
+//			b.radius = ((double)random.nextInt((int)(1000/Math.pow(numberOfBalls,0.5))))/1000;
+//			balls[i] = b;
+//		}
+//		return balls;
+//	}
 
 	void step(double deltaT) {
 		for (Ball b1 : balls) {
@@ -84,6 +84,8 @@ public class Model {
 	void ballCollision ( Ball b1, Ball b2, double deltaT){
 		Vector t = new Vector(b1.x - b2.x, b1.y - b2.y);
 
+		double före = b1.getMass()*b1.v.length()+b2.getMass()*b2.v.length();
+
 		Vector relV = b1.v.subtract(b2.v);
 		Vector force = relV.projectOnVector(t);
 //
@@ -100,7 +102,9 @@ public class Model {
 
 		b1.v = b1.v.subtract(force.withLenght(velocity1));
 		b2.v = b2.v.plus(force.withLenght(velocity2));
-
+		System.out.println("Efter-------------------------------");
+		System.out.println( före - b1.getMass()*b1.v.length()+b2.getMass()*b2.v.length());
+		System.out.println();
 
 	}
 
