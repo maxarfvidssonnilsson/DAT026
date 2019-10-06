@@ -4,8 +4,8 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.07;
-	int numberOfBalls = 10;
+	final double GRAVITY = 0.2;
+	int numberOfBalls = 3;
 	double averageSpeed = 0.5;
 	double errorMargin = 0.1;
 	
@@ -15,10 +15,10 @@ public class Model {
 		areaWidth = width;
 		areaHeight = height;
 
-		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
-		//balls = new Ball[2];
-		//balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
-		//balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
+//		balls = getBalls(numberOfBalls, averageSpeed, areaHeight, areaWidth);
+		balls = new Ball[2];
+		balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
+		balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
 	}
 
 
@@ -101,21 +101,29 @@ public class Model {
 	}
 
 	void ballCollision ( Ball b1, Ball b2, double deltaT){
+
 		Vector t = new Vector(b1.x - b2.x, b1.y - b2.y);
 		Vector relV = b1.v.subtract(b2.v);
-		Vector force = relV.projectOnVector(t);
-		b1.v = b1.v.subtract(force);
-		b2.v = b2.v.plus(force);
+		Vector f1 = b1.v.projectOnVector(t);
+		Vector f2 = b2.v.projectOnVector(t);
 
-//		double ditance = (b1.radius + b2.radius) - Math.sqrt(Math.pow((b1.x - b2.x),2) + Math.pow((b2.y - b2.y),2));
-//
-//		Vector unitVector = new Vector(force.vx/force.length(),force.vy / force.length());
-//		Vector z = new Vector(unitVector.vx *ditance/2, unitVector.vy * ditance/2);
-//		b2.y += z.vy * deltaT;
-//		b2.x += z.vx * deltaT;
-//
-//		b1.y -= z.vy * deltaT;
-//		b1.x -= z.vx * deltaT;
+		b1.v = b1.v.subtract(f1);
+		b1.v = b1.v.subtract(f2);
+
+
+		Vector force = relV.projectOnVector(t);
+
+//		double a = b1.getMass() * f1.length() + b2.getMass() * f2.length();
+//		double c = -(f2.length() - f1.length());
+//		double newf1 = (a - b2.getMass() * c) / (b1.getMass() + b2.getMass());
+//		double newf2 = c + (a - b2.getMass() * c) / (b1.getMass() + b2.getMass());
+
+		// Conservation of momentum formula (because of rotation, y can be used directly, but x needs some tinkering)
+		var newf1 = ((b1.getMass() - b2.getMass()) * f1.length() + (2 * b2.getMass()) * f2.length()) / (b1.getMass() + b2.getMass());
+		var newf2 = ((2 * b1.getMass()) * f2.length() + (b2.getMass() - b1.getMass()) * f2.length()) / (b1.getMass() + b2.getMass());
+
+		b1.v = b1.v.subtract(t.withLength(newf1));
+		b2.v = b2.v.plus(t.withLength(newf2));
 
 
 	}
@@ -130,6 +138,10 @@ public class Model {
 			this.y = y;
 			this.v = new Vector(vx, vy);
 			this.radius = r;
+		}
+
+		double getMass() {
+			return Math.PI * Math.pow(this.radius, 2);
 		}
 
 		boolean checkBallCollsion (Ball b2){
@@ -155,6 +167,10 @@ public class Model {
 
 		double dotproduct (Vector v) {
 			return this.vx * v.vx + this.vy * v.vy;
+		}
+
+		Vector withLength (double len) {
+			return new Vector((this.vx*len)/this.length(), (this.vy*len)/this.length());
 		}
 
 		Vector projectOnVector (Vector tangent) {
