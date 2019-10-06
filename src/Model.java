@@ -4,9 +4,9 @@ public class Model {
 
 	double areaWidth, areaHeight;
 
-	final double GRAVITY = 0.07;
-	int numberOfBalls = 10;
-	double averageSpeed = 0.5;
+	final double GRAVITY = 0.2;
+	int numberOfBalls = 3;
+	double averageSpeed = 0.3;
 	double errorMargin = 0.1;
 	
 	Ball [] balls;
@@ -20,7 +20,6 @@ public class Model {
 		//balls[0] = new Ball(width / 3, height * 0.9, 1.2, 1.6, 0.2);
 		//balls[1] = new Ball(2 * width / 3, height * 0.7, -0.6, 0.6, 0.3);
 	}
-
 
 	Ball[] getBalls(int numberOfBalls, double averageSpeed, double height, double width){
 		Ball[] balls = new Ball[numberOfBalls];
@@ -52,74 +51,49 @@ public class Model {
 		return balls;
 	}
 
-
-
-
 	void step(double deltaT) {
-		for (Ball b1 : balls) {
-			b1.x += deltaT * b1.v.vx;
-			b1.y += deltaT * b1.v.vy;
+		for (Ball b : balls) {
+			b.handleCollisionBorder();
+		}
 
-			boolean isInGround = true;
-			// detect collision with the border
-			if (collidesWithBorder(b1.radius, b1.x, areaWidth, b1.v.vx)) {
-				b1.v.vx *= -1; // change direction of ball
-			}
-			if (collidesWithBorder(b1.radius, b1.y, areaHeight, b1.v.vy)) {
-				b1.v.vy *= -1;
-			} else {
-				isInGround = false;
-			}
-
-			for (Ball b2 : balls){
-				if (b1 != b2 && b1.checkBallCollsion(b2)){
-					double distance = Math.sqrt(Math.pow(b1.x - b2.x,2)+Math.pow(b1.y - b2.y,2));
-					int i = 0;
-					while ((distance <= b1.radius + b2.radius) && i != 10 ) {
-
-						b1.x -= b1.v.vx * errorMargin * deltaT;
-						b2.y -= b2.v.vy * errorMargin* deltaT;
-						b1.y -= b1.v.vy * errorMargin * deltaT;
-						b2.x -= b2.v.vx * errorMargin * deltaT;
-
-						distance = Math.sqrt(Math.pow(b1.x - b2.x, 2) + Math.pow(b1.y - b2.y, 2));
-						i++;
-					}
-					ballCollision(b1, b2,deltaT);
+		for (int i = 0; i < balls.length ; i++) {
+			for (int m = 0; m < i; m++) {
+				if (balls[i].checkBallCollsion(balls[m])) {
+					minimiseCollisionError(balls[i], balls[m], deltaT);
+					ballCollision(balls[i], balls[m]);
 				}
 			}
-			if(!isInGround)
-				b1.v.vy -= GRAVITY;
+		}
+
+		for (Ball b : balls) {
+			b.tick(deltaT);
 		}
 	}
 
-	boolean collidesWithBorder (double radius, double position, double border, double velocity) {
-		if ((position < radius && velocity < 0) || (position > border - radius && velocity > 0)) {
-			return true;
+	void minimiseCollisionError( Ball b1, Ball b2, double deltaT) {
+		double distance = Math.sqrt(Math.pow(b1.x - b2.x,2)+Math.pow(b1.y - b2.y,2));
+		int k = 0;
+		while ((distance <= b1.radius + b2.radius) && k != 10 ) {
+
+			b1.x -= b1.v.vx * errorMargin * deltaT;
+			b2.y -= b2.v.vy * errorMargin* deltaT;
+			b1.y -= b1.v.vy * errorMargin * deltaT;
+			b2.x -= b2.v.vx * errorMargin * deltaT;
+
+			distance = Math.sqrt(Math.pow(b1.x - b2.x, 2) + Math.pow(b1.y - b2.y, 2));
+			k++;
 		}
-		return false;
 	}
 
-	void ballCollision ( Ball b1, Ball b2, double deltaT){
+	void ballCollision ( Ball b1, Ball b2){
+
 		Vector t = new Vector(b1.x - b2.x, b1.y - b2.y);
 		Vector relV = b1.v.subtract(b2.v);
 		Vector force = relV.projectOnVector(t);
 		b1.v = b1.v.subtract(force);
 		b2.v = b2.v.plus(force);
 
-//		double ditance = (b1.radius + b2.radius) - Math.sqrt(Math.pow((b1.x - b2.x),2) + Math.pow((b2.y - b2.y),2));
-//
-//		Vector unitVector = new Vector(force.vx/force.length(),force.vy / force.length());
-//		Vector z = new Vector(unitVector.vx *ditance/2, unitVector.vy * ditance/2);
-//		b2.y += z.vy * deltaT;
-//		b2.x += z.vx * deltaT;
-//
-//		b1.y -= z.vy * deltaT;
-//		b1.x -= z.vx * deltaT;
-
-
 	}
-
 	class Ball {
 
 		double x, y, radius;
@@ -138,6 +112,22 @@ public class Model {
 				return true;
 			else
 				return false;
+		}
+
+		void handleCollisionBorder () {
+			if (		((this.x < this.radius && this.v.vx < 0) || (this.x > areaWidth - this.radius && this.v.vx > 0))) {
+				this.v.vx *= -1; // change direction of ball
+			} else  if(	((this.y < this.radius && this.v.vy < 0) || (this.y > areaHeight- this.radius && this.v.vy > 0))) {
+				this.v.vy *= -1;
+			}
+		}
+
+		void tick(double deltaT) {
+			if (this.y > areaHeight- this.radius) {
+				this.v.vy -= GRAVITY;
+			}
+			this.x += deltaT * this.v.vx;
+			this.y += deltaT * this.v.vy;
 		}
 	}
 
